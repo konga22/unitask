@@ -8,6 +8,10 @@ class AppTheme {
     brightness: Brightness.light,
     visualDensity: VisualDensity.adaptivePlatformDensity,
     scaffoldBackgroundColor: Colors.white,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black,
+    ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       foregroundColor: Colors.white,
       backgroundColor: _primaryColor,
@@ -39,10 +43,15 @@ class AppTheme {
     brightness: Brightness.dark,
     visualDensity: VisualDensity.adaptivePlatformDensity,
     scaffoldBackgroundColor: _darkBackground,
+    appBarTheme: AppBarTheme(
+      backgroundColor: Colors.black,
+      foregroundColor: Colors.white,
+    ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       foregroundColor: Colors.white,
       backgroundColor: _primaryColor,
     ),
+
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(foregroundColor: _primaryColor),
     ),

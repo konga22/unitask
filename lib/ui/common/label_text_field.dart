@@ -1,25 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-class LabelTextField extends StatelessWidget {
+class LabelTextField extends StatefulWidget {
+  final bool enableObscure;
   final String label;
   final String? hintText;
   final IconData? icon;
+  final TextEditingController? controller;
 
   const LabelTextField({
     super.key,
+    this.controller,
     required this.label,
     this.hintText,
     this.icon,
+    this.enableObscure = false,
   });
 
-class _LabelTextFieldState extends State<LabelTextField>
-  late final bool _obscureText = widget.enableObscure;
+  @override
+  State<LabelTextField> createState() => _LabelTextFieldState();
+}
 
-  void _switchObscure(){
-    setState((){
-      obscureText = !_obscureText;
+class _LabelTextFieldState extends State<LabelTextField> {
+  late bool _obscureText = widget.enableObscure;
+
+  void _switchObscure() {
+    setState(() {
+      _obscureText = !_obscureText;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -27,22 +37,21 @@ class _LabelTextFieldState extends State<LabelTextField>
       mainAxisSize: .min,
       crossAxisAlignment: .stretch,
       children: [
-        Text(label, style: TextStyle(fontWeight: .bold)),
+        Text(widget.label, style: TextStyle(fontWeight: .bold)),
         TextField(
+          controller: widget.controller,
           obscureText: _obscureText,
           decoration: InputDecoration(
-            prefixIcon: Icon(Widget.icon),
+            prefixIcon: Icon(widget.icon),
             suffixIcon: widget.enableObscure
-            ? InkWell(
-                onTap: _switchObscure,
-                child: Icon(
-                  _obscureText
-                    ? LucideIcons.eyeClosed
-                    : LucideIcons.eye,
-                ),
-               ),
+                ? InkWell(
+                    onTap: _switchObscure,
+                    child: Icon(
+                      _obscureText ? LucideIcons.eyeClosed : LucideIcons.eye,
+                    ),
+                  )
                 : null,
-              hintText: widget.hintText,
+            hintText: widget.hintText,
           ),
         ),
       ],
