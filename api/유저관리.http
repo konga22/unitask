@@ -1,0 +1,7 @@
+POST https://daelim.fleecy.dev/functions/v1/students/signup
+
+{
+    "email": "",
+    "password": "",
+    "name": ""
+}
