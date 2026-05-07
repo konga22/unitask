@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:unitask/app/extensions/snackbar_extension.dart';
 import 'package:unitask/services/api_service.dart';
@@ -22,22 +23,31 @@ class _SignupPageState extends State<SignupPage> {
   void _startLoading() => setState(() => _loading = true);
   void _stopLoading() => setState(() => _loading = false);
 
-  void onSignup() async {
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _passwordConfirmController.dispose();
+
+    super.dispose();
+  }
+
+  Future<void> _onSignup() async {
+    debugPrint('계정 만들기');
+
     final name = _nameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
     final passwordConfirm = _passwordConfirmController.text.trim();
 
-    if (name.isEmpty ||
-        email.isEmpty ||
-        password.isEmpty ||
-        passwordConfirm.isEmpty) {
-      context.showSnackbar('정보가 올바르지 않습니다.', isError: true);
+    if (name.isEmpty || email.isEmpty || password.isEmpty) {
+      context.showSnackbar("정보가 올바르지 않습니다.", isError: true);
       return;
     }
 
     if (password != passwordConfirm) {
-      context.showSnackbar('비밀번호가 일치하지 않습니다.', isError: true);
+      context.showSnackbar("비밀번호가 일치하지 않습니다.", isError: true);
       return;
     }
 
@@ -54,18 +64,13 @@ class _SignupPageState extends State<SignupPage> {
     if (signupResult == null) return;
 
     if (!signupResult) {
-      if (mounted) context.showSnackbar('계정 생성에 실패했습니다.', isError: true);
+      if (mounted) {
+        context.showSnackbar('계정 생성에 실패했습니다.', isError: true);
+      }
+      return;
     }
-    return;
-  }
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    _passwordConfirmController.dispose();
-    super.dispose();
+    if (mounted) context.pop();
   }
 
   @override
@@ -73,67 +78,54 @@ class _SignupPageState extends State<SignupPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text(
-          '회원가입',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: Text('회원가입', style: TextStyle(fontWeight: .bold)),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 25),
-              child: LabelTextField(
+        padding: .all(20),
+        child: SingleChildScrollView(
+          child: Column(
+            spacing: 25,
+            children: [
+              LabelTextField(
                 controller: _nameController,
                 label: '이름',
                 icon: LucideIcons.userRoundPen,
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 25),
-              child: LabelTextField(
+              LabelTextField(
                 controller: _emailController,
                 label: '이메일',
                 icon: LucideIcons.mail,
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 25),
-              child: LabelTextField(
+              LabelTextField(
                 controller: _passwordController,
                 label: '비밀번호',
-                icon: LucideIcons.lockKeyholeOpen,
                 enableObscure: true,
+                icon: LucideIcons.lockKeyhole,
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 25),
-              child: LabelTextField(
+              LabelTextField(
                 controller: _passwordConfirmController,
                 label: '비밀번호 확인',
-                icon: LucideIcons.lockKeyholeOpen,
                 enableObscure: true,
+                icon: LucideIcons.lockKeyholeOpen,
               ),
-            ),
-            ElevatedButton(
-              onPressed: onSignup,
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size.fromHeight(55),
-                textStyle: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+              //계정 만들기 버튼
+              SizedBox(
+                width: .infinity,
+                child: ElevatedButton(
+                  onPressed: _onSignup,
+                  child: _loading
+                      ? const SizedBox.square(
+                          dimension: 30,
+                          child: CircularProgressIndicator(color: Colors.white),
+                        )
+                      : const Text(
+                          '계정 만들기',
+                          style: TextStyle(fontWeight: .bold, fontSize: 20),
+                        ),
                 ),
               ),
-              child: _loading
-                  ? const SizedBox.square(
-                      dimension: 30,
-                      child: CircularProgressIndicator(color: Colors.white),
-                    )
-                  : const Text('계정 만들기'),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
