@@ -33,22 +33,18 @@ class _LoginPageState extends State<LoginPage> {
     if (email.isEmpty || password.isEmpty) {
       return context.showSnackbar('이메일 또는 비밀번호를 입력해주세요', isError: true);
     }
-    final response = await ApiService.login(
-      email: email,
-      password: password,
-    );
+    final response = await ApiService.login(email: email, password: password);
 
     if (response == null) {
       if (mounted) {
-        context.showSnackbar(
-          '로그인을 실패했습니다',
-          isError: true,
-        );
+        context.showSnackbar('로그인을 실패했습니다', isError: true);
       }
       return;
     }
 
-    debugPrint('$response');
+    if (mounted) {
+      context.goNamed(AppPage.home.name);
+    }
   }
 
   @override

@@ -11,6 +11,11 @@ class AppTheme {
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.white,
       foregroundColor: Colors.black,
+      titleTextStyle: TextStyle(
+        fontWeight: .bold,
+        color: Colors.black,
+        fontSize: 24,
+      ),
     ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       foregroundColor: Colors.white,
