@@ -1,27 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import 'package:unitask/app/extensions/snackbar_extension.dart';
-import 'package:unitask/services/api_service.dart';
+import 'package:unitask/core/extensions/build_context_extension.dart';
+import 'package:unitask/core/extensions/models/result.dart';
+import 'package:unitask/features/auth/auth_provider.dart';
 import 'package:unitask/ui/common/label_text_field.dart';
 
-class SignupPage extends StatefulWidget {
+class SignupPage extends ConsumerStatefulWidget {
   const SignupPage({super.key});
 
   @override
-  State<SignupPage> createState() => _SignupPageState();
+  ConsumerState<SignupPage> createState() => _SignupPageState();
 }
 
-class _SignupPageState extends State<SignupPage> {
+class _SignupPageState extends ConsumerState<SignupPage> {
   final TextEditingController _nameController = .new();
   final TextEditingController _emailController = .new();
   final TextEditingController _passwordController = .new();
   final TextEditingController _passwordConfirmController = .new();
-
-  bool _loading = false;
-
-  void _startLoading() => setState(() => _loading = true);
-  void _stopLoading() => setState(() => _loading = false);
 
   @override
   void dispose() {
@@ -51,30 +48,29 @@ class _SignupPageState extends State<SignupPage> {
       return;
     }
 
-    _startLoading();
+    final result = await ref.read(authProvider.notifier).signup(
+          email: email,
+          password: password,
+          name: name,
+        );
 
-    final signupResult = await ApiService.signup(
-      email: email,
-      password: password,
-      name: name,
-    );
-
-    _stopLoading();
-
-    if (signupResult == null) return;
-
-    if (!signupResult) {
-      if (mounted) {
-        context.showSnackbar('계정 생성에 실패했습니다.', isError: true);
-      }
-      return;
+    switch (result) {
+      case Success():
+        if (mounted) context.pop();
+      case Failure(:final exception):
+        if (mounted) {
+          context.showSnackbar(
+            exception.toString(),
+            isError: true,
+          );
+        }
     }
-
-    if (mounted) context.pop();
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(authProvider).isLoading;
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -111,17 +107,21 @@ class _SignupPageState extends State<SignupPage> {
               //계정 만들기 버튼
               SizedBox(
                 width: .infinity,
-                child: ElevatedButton(
-                  onPressed: _onSignup,
-                  child: _loading
+                child: ElevatedButton.icon(
+                  onPressed: isLoading ? null : _onSignup,
+                  icon: isLoading
                       ? const SizedBox.square(
-                          dimension: 30,
-                          child: CircularProgressIndicator(color: Colors.white),
+                          dimension: 14,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
                         )
-                      : const Text(
-                          '계정 만들기',
-                          style: TextStyle(fontWeight: .bold, fontSize: 20),
-                        ),
+                      : null,
+                  label: const Text(
+                    '계정 만들기',
+                    style: TextStyle(fontWeight: .bold, fontSize: 20),
+                  ),
                 ),
               ),
             ],

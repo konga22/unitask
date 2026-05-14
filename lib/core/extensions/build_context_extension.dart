@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-extension SnackbarExtension on BuildContext {
+extension BuildContextExtension on BuildContext {
   void showSnackbar(String message, {bool isError = false}) {
     ScaffoldMessenger.of(this).showSnackBar(
       SnackBar(
