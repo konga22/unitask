@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:unitask/app/theme/preview.dart';
+import 'package:unitask/ui/common/subject_label.dart';
 
-@AppThemePreview(group: 'Items', name: 'TaskCard')
+@AppThemePreview(group: 'Card', name: 'TaskCard', brightness: .light)
 Widget preview() {
-  return TaskCard(
-    checked: false,
-    title: 'Flutter 개발',
-    date: DateTime.now(),
-    category: Container(width: 30, height: 15, color: Colors.blue),
+  var checked = false;
+
+  return StatefulBuilder(
+    builder: (context, setState) => TaskCard(
+      onSelected: () {},
+      onChecked: (value) {
+        setState(() => checked = value ?? false);
+      },
+      checked: checked,
+      title: 'Unitask 끝내기',
+      date: DateTime.now().copyWith(month: 6, day: 4),
+      category: const SubjectLabel(text: 'Flutter'),
+    ),
   );
 }
 
@@ -32,41 +42,63 @@ class TaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dDay = date.difference(DateTime.now()).inDays;
+
+    final dDayColor = switch (dDay) {
+      <= 3 => Colors.red, // 3일 남음
+      <= 7 => Colors.orange, // 7일 남음
+      _ => Colors.black, // 기본
+    };
+
     return Card(
-      child: InkWell(
-        onTap: onSelected,
-        child: Padding(
-          padding: const .all(16),
-          child: Column(
-            crossAxisAlignment: .stretch,
-            spacing: 5,
-            children: [
-              Row(
-                mainAxisAlignment: .spaceBetween,
-                children: [
-                  category,
-                  Checkbox(
-                    onChanged: onChecked,
-                    value: checked,
+      child: Container(
+        height: 120,
+        padding: const .symmetric(vertical: 6, horizontal: 12),
+        child: Column(
+          crossAxisAlignment: .stretch,
+          spacing: 5,
+          children: [
+            Row(
+              mainAxisAlignment: .spaceBetween,
+              children: [
+                category,
+                Checkbox(
+                  onChanged: onChecked,
+                  value: checked,
+                  visualDensity: .compact,
+                  activeColor: Colors.blue,
+                  fillColor: .resolveWith(
+                    (states) => states.contains(WidgetState.selected)
+                        ? Colors.blue
+                        : const Color(0xFFF3F4F6),
                   ),
-                ],
-              ),
-              Text(title),
-              Row(
-                spacing: 5,
-                children: [
-                  const Icon(LucideIcons.calendar),
-                  // TODO:아이콘 색상 설정은 아래와 같음
-                  // =< D-3 :빨강
-                  // =< D-7 :주황
-                  // > D-7 :검정
-                  Text(
-                    '', //date time, intal라이브러리 사용해서
+                  shape: RoundedRectangleBorder(
+                    borderRadius: .circular(5),
+                    side: const BorderSide(color: Colors.transparent),
                   ),
-                ],
-              ),
-            ],
-          ),
+                  side: const BorderSide(color: Colors.transparent),
+                  materialTapTargetSize: .shrinkWrap,
+                ),
+              ],
+            ),
+            Text(
+              title,
+              maxLines: 1,
+              overflow: .ellipsis,
+              style: const TextStyle(fontSize: 15, fontWeight: .bold),
+            ),
+            // 기한 표시
+            Row(
+              spacing: 5,
+              children: [
+                Icon(LucideIcons.calendarRange, size: 12, color: dDayColor),
+                Text(
+                  DateFormat('yyyy.MM.dd').format(date),
+                  style: TextStyle(fontSize: 12, color: dDayColor),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

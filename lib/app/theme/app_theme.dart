@@ -43,6 +43,7 @@ class AppTheme {
         borderSide: BorderSide.none,
       ),
     ),
+    cardTheme: const CardThemeData(elevation: 4, color: Colors.white),
   );
 
   static ThemeData get dark => ThemeData.dark(useMaterial3: true).copyWith(
